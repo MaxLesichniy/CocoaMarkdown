@@ -17,7 +17,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CMImageTextAttachment : NSTextAttachment
 
-- (instancetype) initWithImageURL:(NSURL*)imageURL;
+- (instancetype) initWithImageURL:(NSURL*)imageURL defaultImageSize:(CGSize)defaultSize;
+
+/**
+*  Set a default size to the ImageTextAttachement.
+*
+*  @param newSize The new size of the ImageTextAttachement image.
+*/
+- (void) setImageTextAttachementSize:(CGSize)newSize;
+
 
 @property (nonatomic, readonly) NSURL* imageURL;
 

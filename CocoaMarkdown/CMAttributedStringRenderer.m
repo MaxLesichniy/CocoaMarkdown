@@ -28,6 +28,7 @@
     CMTextAttributes *_attributes;
     CMCascadingAttributeStack *_attributeStack;
     CMStack *_HTMLStack;
+    CGSize _defaultImageTextAttachementSize;
     NSMutableDictionary *_tagNameToTransformerMapping;
     NSMutableAttributedString *_buffer;
     NSAttributedString *_attributedString;
@@ -159,13 +160,13 @@
 
 - (void)parser:(CMParser *)parser didStartImageWithURL:(NSURL *)URL title:(NSString *)title
 {
-    NSTextAttachment* textAttachment = [[CMImageTextAttachment alloc] initWithImageURL:URL];
+    CMImageTextAttachment* textAttachment = [[CMImageTextAttachment alloc] initWithImageURL:URL defaultImageSize:_defaultImageTextAttachementSize];
     if (textAttachment != nil) {
         // Detect if an image has its own paragraph, in which cas we can apply specific attributes.
         // (Note: This test also detect the case: image in link in paragraph)
         CMNode* imageNode = parser.currentNode;
-        BOOL isInImageParagraph = ((imageNode.next == nil) && (imageNode.previous == nil) 
-                                   && ((imageNode.parent.type == CMNodeTypeParagraph) 
+        BOOL isInImageParagraph = ((imageNode.next == nil) && (imageNode.previous == nil)
+                                   && ((imageNode.parent.type == CMNodeTypeParagraph)
                                        || ((imageNode.parent.next == nil) && (imageNode.parent.previous == nil) && (imageNode.parent.parent.type == CMNodeTypeParagraph))));
         
         CMHTMLElement *element = [_HTMLStack peek];
@@ -182,7 +183,7 @@
             if ((imageDescriptionNode.type == CMNodeTypeText) && (imageDescriptionNode.stringValue.length > 0)) {
                 imageAttachmentAttributes[NSToolTipAttributeName] = imageDescriptionNode.stringValue;
             }
-#endif     
+#endif
             const unichar attachmentChar = NSAttachmentCharacter;
             NSAttributedString *attachmentString = [[NSAttributedString alloc] initWithString:[NSString stringWithCharacters:&attachmentChar length:1] attributes:imageAttachmentAttributes];
             [_buffer appendAttributedString:attachmentString];
@@ -366,6 +367,11 @@
         return element;
     }
     return nil;
+}
+
+- (void) setImageTextAttachementSize:(CGSize)newSize
+{
+    _defaultImageTextAttachementSize = newSize;
 }
 
 - (BOOL)isImageDescriptionNode:(CMNode *)node

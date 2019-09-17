@@ -31,7 +31,7 @@
 
 @implementation CMImageTextAttachment
 
-static CGSize _placeholderImageSize = {16, 16};
+static CGSize _placeholderImageSize = {164, 164};
 static CGFloat _placeholderImageCornerRadius = 3.0;
 
 #if TARGET_OS_IPHONE
@@ -79,8 +79,12 @@ static NSImage* _placeholderImage;
 }
 #endif
 
-- (instancetype) initWithImageURL:(NSURL*)imageURL
+- (instancetype) initWithImageURL:(NSURL*)imageURL defaultImageSize:(CGSize)defaultSize
 {
+    if (!CGSizeEqualToSize(CGSizeZero, defaultSize))
+    {
+        _placeholderImageSize = defaultSize;
+    }
     NSString* imageUrlUti = (__bridge_transfer NSString*) UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, (__bridge CFStringRef)imageURL.pathExtension, kUTTypeData);
     
     self = [super initWithData:nil ofType:imageUrlUti];
@@ -91,6 +95,7 @@ static NSImage* _placeholderImage;
     }
     return self;
 }
+
 
 
 - (CGRect) attachmentBoundsForTextContainer:(NSTextContainer *)textContainer proposedLineFragment:(CGRect)lineFrag glyphPosition:(CGPoint)position characterIndex:(NSUInteger)charIndex
@@ -113,7 +118,7 @@ static NSImage* _placeholderImage;
 #else
 - (nullable NSImage *)imageForBounds:(NSRect)imageBounds textContainer:(nullable NSTextContainer *)textContainer characterIndex:(NSUInteger)charIndex
 #endif
-{    
+{
     if (! _isImageLoaded && (_imageURL != nil)) {
         
         // Save a reference to the textcontainer
@@ -123,10 +128,10 @@ static NSImage* _placeholderImage;
         if (_imageURL.isFileURL) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 
-                NSData* imageData = [NSData dataWithContentsOfURL:self->_imageURL];
+                NSData* imageData = [NSData dataWithContentsOfURL:_imageURL];
                 if (imageData.length > 0) {
                     [self setImageWithData:imageData];
-                    self->_isImageLoaded = YES;
+                    _isImageLoaded = YES;
                 }
             });
         }
@@ -137,16 +142,16 @@ static NSImage* _placeholderImage;
                 if ((error == nil) && (data.length > 0)) {
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [self setImageWithData:data];
-                        self->_isImageLoaded = YES;
+                        _isImageLoaded = YES;
                     });
                 }
                 
-                self->_downloadTask = nil;
+                _downloadTask = nil;
             }];
             
             [_downloadTask resume];
         }
-    }    
+    }
     
 #if !TARGET_OS_IPHONE
     [self.image setFlipped:NSGraphicsContext.currentContext.isFlipped];
@@ -170,6 +175,8 @@ static NSImage* _placeholderImage;
 #endif
     
     if (self.image != nil) {
+        
+        self.image = [self imageWithImage:self.image scaledToMaxWidth:_placeholderImageSize.width maxHeight:_placeholderImageSize.height];
         if (! CGSizeEqualToSize(self.image.size, currentImageSize)) {
              // The layout needs to be refreshed
             [_textContainer.layoutManager setNeedsLayoutForAttachment:self];
@@ -178,6 +185,35 @@ static NSImage* _placeholderImage;
             // The image display should be refreshed
             [_textContainer.layoutManager setNeedsDisplayForAttachment:self];
         }
+    }
+}
+
+- (UIImage *)imageWithImage:(UIImage *)image scaledToMaxWidth:(CGFloat)width maxHeight:(CGFloat)height {
+    CGFloat oldWidth = image.size.width;
+    CGFloat oldHeight = image.size.height;
+
+    CGFloat scaleFactor = (oldWidth > oldHeight) ? width / oldWidth : height / oldHeight;
+
+    CGFloat newHeight = oldHeight * scaleFactor;
+    CGFloat newWidth = oldWidth * scaleFactor;
+    CGSize newSize = CGSizeMake(newWidth, newHeight);
+
+    return [self imageWithImage:image scaledToSize:newSize];
+}
+- (UIImage *) imageWithImage:(UIImage *)image scaledToSize:(CGSize)newSize {
+    UIGraphicsBeginImageContext(newSize);
+    UIGraphicsBeginImageContextWithOptions(newSize, NO, 0.0);
+    [image drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return newImage;
+}
+
+- (void) setImageTextAttachementSize:(CGSize)newSize
+{
+    if (!CGSizeEqualToSize(CGSizeZero, newSize))
+    {
+        _placeholderImageSize = newSize;
     }
 }
 
