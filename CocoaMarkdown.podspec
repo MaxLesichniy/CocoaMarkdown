@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name          = 'CocoaMarkdown'
-  s.version       = '1.2.5'
+  s.version       = '1.2.6'
   s.summary       = 'Markdown parsing and rendering for iOS and OS X'
   s.description   = "CocoaMarkdown aims to solve two primary problems better than existing libraries:
 More flexibility. CocoaMarkdown allows you to define custom parsing hooks or even traverse the Markdown AST using the low-level API.
@@ -13,7 +13,7 @@ Efficient NSAttributedString creation for easy rendering on iOS and OS X. Most e
   s.author        = "Aymen letaief"
   s.ios.deployment_target = '9.0'
 
-  s.source        = { :git => 'https://github.com/fgulan/CocoaMarkdown.git', :tag => "#{s.version}" }
+  s.source        = { :git => 'https://github.com/LetaiefAymen/CocoaMarkdown.git', :tag => "#{s.version}" }
   s.preserve_paths = ['CocoaMarkdown.framework/*']
   s.ios.source_files = 'CocoaMarkdown.framework/Headers/*.h'
   s.ios.public_header_files = 'CocoaMarkdown.framework/Headers/*.h'
