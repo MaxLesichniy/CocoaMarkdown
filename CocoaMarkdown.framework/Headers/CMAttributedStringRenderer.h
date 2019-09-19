@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 @class CMDocument;
 @class CMTextAttributes;
@@ -43,5 +44,12 @@
  *  styled using the attributes set on the receiver.
  */
 - (NSAttributedString *)render;
+
+/**
+*  Set a default size to the ImageTextAttachement.
+*
+*  @param newSize The new size of the ImageTextAttachement image.
+*/
+- (void) setImageTextAttachementSize:(CGSize)newSize;
 
 @end
