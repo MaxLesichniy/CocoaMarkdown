@@ -14,7 +14,10 @@ Efficient NSAttributedString creation for easy rendering on iOS and OS X. Most e
   s.ios.deployment_target = '9.0'
 
   s.source        = { :git => 'https://github.com/LetaiefAymen/CocoaMarkdown.git', :tag => "#{s.version}" }
-  s.ios.source_files = 'CocoaMarkdown/**/*.{h,m}'
+  s.preserve_paths = ['CocoaMarkdown.framework/*']
+  s.ios.source_files = 'CocoaMarkdown.framework/**/*.{h,m}'
+  s.ios.public_header_files = 'CocoaMarkdown.framework/Headers/*.h'
+  s.ios.vendored_frameworks = 'CocoaMarkdown.framework'
   s.ios.libraries     = 'xml2'
 
   s.xcconfig      = { 'HEADER_SEARCH_PATHS' => '$(SDKROOT)/usr/include/libxml2' }
