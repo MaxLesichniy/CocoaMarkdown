@@ -32,6 +32,7 @@
 @implementation CMImageTextAttachment
 
 static CGSize _placeholderImageSize = {164, 164};
+static NSString* _placeholderImageName = @"ic_image";
 static CGFloat _placeholderImageCornerRadius = 3.0;
 
 #if TARGET_OS_IPHONE
@@ -40,18 +41,21 @@ static UIImage* _placeholderImage;
 + (UIImage*) placeholderImage
 {
     if (_placeholderImage == nil) {
+        
+        UIImage* image = [UIImage imageNamed:_placeholderImageName inBundle:[NSBundle mainBundle] compatibleWithTraitCollection:nil];
+        
         UIGraphicsBeginImageContextWithOptions(_placeholderImageSize, NO, 0);
-        
+
         CGRect imageRect = CGRectMake(0, 0, _placeholderImageSize.width, _placeholderImageSize.height);
-        UIBezierPath* placeholderShape = [UIBezierPath bezierPathWithRoundedRect: imageRect cornerRadius:(CGFloat)_placeholderImageCornerRadius];
-        [UIColor.lightGrayColor setFill];
-        [placeholderShape fill];
-        [UIColor.grayColor setStroke];
-        [placeholderShape stroke];
-        [@"?" drawInRect:CGRectInset(imageRect, 4, -1) withAttributes:@{ NSFontAttributeName: [UIFont systemFontOfSize:imageRect.size.height - 2],
-                                                                         NSForegroundColorAttributeName: UIColor.whiteColor }];
-        _placeholderImage = UIGraphicsGetImageFromCurrentImageContext();
+        CGRect placeholderRect = CGRectMake(imageRect.origin.x + (imageRect.size.width/2) - image.size.width, imageRect.origin.y + (imageRect.size.height/2) - image.size.height, image.size.width * 2, image.size.height *2);
         
+        UIBezierPath* placeholderShape = [UIBezierPath bezierPathWithRoundedRect: imageRect cornerRadius:(CGFloat)_placeholderImageCornerRadius];
+        [[UIColor colorWithWhite:0 alpha:0.07] setFill];
+        [placeholderShape fill];
+        [[UIColor colorWithWhite:0 alpha:0.38] setFill];
+        [image drawInRect:placeholderRect blendMode:kCGBlendModeNormal alpha:0.8];
+        _placeholderImage = UIGraphicsGetImageFromCurrentImageContext();
+
         UIGraphicsEndImageContext();
     }
     return _placeholderImage;
@@ -215,6 +219,11 @@ static NSImage* _placeholderImage;
     {
         _placeholderImageSize = newSize;
     }
+}
+
+- (void) setImagePlaceHolderImageName:(NSString*)imageName
+{
+    _placeholderImageName = imageName;
 }
 
 @end

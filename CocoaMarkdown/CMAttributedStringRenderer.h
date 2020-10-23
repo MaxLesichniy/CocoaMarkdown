@@ -52,4 +52,11 @@
 */
 - (void) setImageTextAttachementSize:(CGSize)newSize;
 
+/**
+*  Set a default placeholder image name to the ImageTextAttachement.
+*
+*  @param newSize The new size of the ImageTextAttachement image.
+*/
+- (void) setImagePlaceHolderImageName:(NSString*)imageName;
+
 @end
