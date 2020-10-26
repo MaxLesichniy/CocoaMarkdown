@@ -132,10 +132,10 @@ static NSImage* _placeholderImage;
         if (_imageURL.isFileURL) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 
-                NSData* imageData = [NSData dataWithContentsOfURL:_imageURL];
+                NSData* imageData = [NSData dataWithContentsOfURL:self->_imageURL];
                 if (imageData.length > 0) {
                     [self setImageWithData:imageData];
-                    _isImageLoaded = YES;
+                    self->_isImageLoaded = YES;
                 }
             });
         }
@@ -146,11 +146,11 @@ static NSImage* _placeholderImage;
                 if ((error == nil) && (data.length > 0)) {
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [self setImageWithData:data];
-                        _isImageLoaded = YES;
+                        self->_isImageLoaded = YES;
                     });
                 }
                 
-                _downloadTask = nil;
+                self->_downloadTask = nil;
             }];
             
             [_downloadTask resume];
@@ -169,9 +169,7 @@ static NSImage* _placeholderImage;
     NSString* imageUti = (__bridge_transfer NSString*) UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, (__bridge CFStringRef)_imageURL.pathExtension, kUTTypeData);
     self.fileType = imageUti;
     self.contents = imageData;
-    
-    CGSize currentImageSize = self.image.size;
-    
+        
 #if TARGET_OS_IPHONE
     self.image = [UIImage imageWithData: imageData];
 #else
@@ -181,14 +179,7 @@ static NSImage* _placeholderImage;
     if (self.image != nil) {
         
         self.image = [self imageWithImage:self.image scaledToMaxWidth:_placeholderImageSize.width maxHeight:_placeholderImageSize.height];
-        if (! CGSizeEqualToSize(self.image.size, currentImageSize)) {
-             // The layout needs to be refreshed
-            [_textContainer.layoutManager setNeedsLayoutForAttachment:self];
-        }
-        else {
-            // The image display should be refreshed
-            [_textContainer.layoutManager setNeedsDisplayForAttachment:self];
-        }
+        [_textContainer.layoutManager setNeedsLayoutForAttachment:self];
     }
 }
 
