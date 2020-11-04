@@ -180,6 +180,7 @@ static NSImage* _placeholderImage;
         
         self.image = [self imageWithImage:self.image scaledToMaxWidth:_placeholderImageSize.width maxHeight:_placeholderImageSize.height];
         [_textContainer.layoutManager setNeedsLayoutForAttachment:self];
+        [_textContainer.layoutManager invalidateDisplayForCharacterRange:NSMakeRange(0, _textContainer.layoutManager.textStorage.length)];
     }
 }
 
